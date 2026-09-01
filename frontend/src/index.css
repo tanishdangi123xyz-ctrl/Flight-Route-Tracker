@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+
+body {
+  @apply bg-ink text-paper;
+  background-image:
+    radial-gradient(ellipse 800px 500px at 10% -10%, rgba(94, 234, 212, 0.08), transparent 60%),
+    radial-gradient(ellipse 600px 400px at 100% 0%, rgba(240, 169, 58, 0.06), transparent 60%),
+    linear-gradient(rgba(94, 234, 212, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 212, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+::selection { background: rgba(94, 234, 212, 0.35); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0A0E14; }
+::-webkit-scrollbar-thumb { background: #1E2733; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #2A3644; }
+
+:focus-visible {
+  outline: 2px solid #5EEAD4;
+  outline-offset: 2px;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.radar-sweep { animation: radar-sweep 4s linear infinite; }
+
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-enter { animation: fade-slide-up 0.5s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep { animation: none; }
+  .animate-enter { animation: none; }
+}
+
+.select-clean {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238593A8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #111926 !important;
+  color: #E8EDF4 !important;
+  border: 1px solid #1E2733 !important;
+  border-radius: 8px !important;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+.leaflet-popup-tip { background: #111926 !important; }
+.leaflet-container {
+  background: #0A0E14 !important;
+  font-family: 'IBM Plex Mono', monospace;
+}

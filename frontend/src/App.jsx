@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
-import Controls from './components/Controls';
 import ChangesTable from './components/ChangesTable';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -13,6 +13,8 @@ export default function App() {
   const [changes, setChanges] = useState([]);
   const [airlineFilter, setAirlineFilter] = useState('');
   const [airportFilter, setAirportFilter] = useState('');
+  const [isIngesting, setIsIngesting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadSnapshots = async () => {
     const res = await fetch(`${API}/api/snapshots`);
@@ -40,25 +42,54 @@ export default function App() {
   };
 
   useEffect(() => {
-    loadSnapshots().then(data => data.length && loadRoutes(data[0].id));
+    (async () => {
+      const data = await loadSnapshots();
+      if (data.length) await loadRoutes(data[0].id);
+      setIsLoading(false);
+    })();
   }, []);
 
+  const handleIngest = async () => {
+    setIsIngesting(true);
+    try {
+      await fetch(`${API}/api/ingest`, { method: 'POST' });
+      await loadSnapshots();
+    } finally {
+      setIsIngesting(false);
+    }
+  };
+
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Flight Route Change Tracker</h1>
-      <Controls
+    <div className="min-h-screen lg:h-screen w-full flex flex-col lg:flex-row lg:overflow-hidden">
+      <Sidebar
         snapshots={snapshots}
         snapshotA={snapshotA} snapshotB={snapshotB}
         setSnapshotA={setSnapshotA} setSnapshotB={setSnapshotB}
         onCompare={() => { loadChanges(snapshotA, snapshotB); loadRoutes(snapshotB); }}
-        onIngest={async () => { await fetch(`${API}/api/ingest`, { method: 'POST' }); await loadSnapshots(); }}
+        onIngest={handleIngest}
+        isIngesting={isIngesting}
         airlineFilter={airlineFilter} setAirlineFilter={setAirlineFilter}
         airportFilter={airportFilter} setAirportFilter={setAirportFilter}
         onApplyFilter={() => loadRoutes(snapshotB, airlineFilter, airportFilter)}
+        routeCount={routes.length}
+        changeCount={changes.length}
       />
-      <MapView routes={routes} />
-      <h2 className="text-xl font-semibold mt-6 mb-2">Detected Changes</h2>
-      <ChangesTable changes={changes} />
+
+      <main className="flex-1 lg:h-screen lg:overflow-y-auto">
+        <div className="p-6 animate-enter">
+          <MapView routes={routes} isLoading={isLoading} />
+        </div>
+
+        <div className="px-6 pb-8 animate-enter" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-mono uppercase tracking-[0.2em] text-fog">Detected changes</h2>
+            {snapshotA && snapshotB && (
+              <span className="text-xs font-mono text-fog">#{snapshotA} → #{snapshotB}</span>
+            )}
+          </div>
+          <ChangesTable changes={changes} />
+        </div>
+      </main>
     </div>
   );
 }
