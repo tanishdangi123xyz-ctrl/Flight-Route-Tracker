@@ -26,9 +26,12 @@ export default function FlapNumber({ value, digits = 4 }) {
   }, [value, target]);
 
   return (
-    <span className="inline-flex font-mono tabular-nums tracking-wider text-lg">
+    <span className="inline-flex gap-[3px]">
       {display.split('').map((ch, i) => (
-        <span key={i} className="inline-block w-[1ch] text-center bg-ink border border-panelLine rounded-sm mx-[1px] px-1 py-0.5 text-scope">
+        <span
+          key={i}
+          className="flex items-center justify-center w-6 h-8 bg-ink border border-panelLine rounded-sm text-scope font-mono text-lg leading-none tabular-nums"
+        >
           {ch}
         </span>
       ))}
